@@ -1,0 +1,175 @@
+/* CSS Variables */
+:root {
+    --primary-color: #4CAF50;
+    --secondary-color: #2196F3;
+    --danger-color: #f44336;
+    --background-color: #fff;
+    --text-color: #333;
+    --border-radius: 8px;
+    --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --hover-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --transition-speed: 0.3s;
+}
+
+/* General styles */
+body {
+    font-family: 'Montserrat', Arial, sans-serif;
+    background: url('/static/kda-3d-text-neon-3840x2160-9461.jpg') center/cover no-repeat, rgba(0, 0, 0, 0.2);
+    background-blend-mode: darken;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    color: var(--text-color);
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.329);
+    backdrop-filter: blur(90px);
+    z-index: -1;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+/* Form styles */
+form {
+    background: var(--background-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: 600px;
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+form:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--hover-shadow);
+}
+
+input[type="text"] {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+button {
+    background: linear-gradient(135deg, var(--primary-color), #66bb6a);
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background var(--transition-speed), transform var(--transition-speed);
+}
+
+button:hover {
+    background: linear-gradient(135deg, #45a049, var(--primary-color));
+    transform: translateY(-2px);
+}
+
+#options input[type="text"] {
+    margin-top: 5px;
+}
+
+/* Poll styles */
+#polls {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.poll {
+    background: var(--background-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.poll:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--hover-shadow);
+}
+
+.poll h2 {
+    font-size: 1.5rem;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.vote-button {
+    background: linear-gradient(135deg, var(--secondary-color), #64b5f6);
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin: 5px 0;
+    transition: background var(--transition-speed), transform var(--transition-speed);
+}
+
+.vote-button:hover {
+    background: linear-gradient(135deg, #1e88e5, var(--secondary-color));
+    transform: translateY(-2px);
+}
+
+.delete-button {
+    background: linear-gradient(135deg, var(--danger-color), #e57373);
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 10px;
+    transition: background var(--transition-speed), transform var(--transition-speed);
+}
+
+.delete-button:hover {
+    background: linear-gradient(135deg, #e53935, var(--danger-color));
+    transform: translateY(-2px);
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    form, .poll {
+        padding: 15px;
+    }
+
+    input[type="text"] {
+        font-size: 0.9rem;
+    }
+
+    button {
+        font-size: 0.9rem;
+    }
+
+    .vote-button, .delete-button {
+        font-size: 0.9rem;
+    }
+}

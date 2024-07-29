@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Real-Time Polling System</title>
+    <link rel="stylesheet" href="static/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Real-Time Polling System</h1>
+    
+    <form id="createPollForm">
+        <input type="text" name="question" placeholder="Poll Question" required>
+        <div id="options">
+            <input type="text" name="options" placeholder="Option 1" required>
+            <input type="text" name="options" placeholder="Option 2" required>
+        </div>
+        <button type="button" onclick="addOption()">Add Option</button>
+        <button type="submit">Create Poll</button>
+    </form>
+
+    <div id="polls">
+        {% for poll in polls %}
+            <div class="poll" id="poll-{{ poll.id }}">
+                <h2>{{ poll.question }}</h2>
+                {% for option in poll.options %}
+                    <div>
+                        <button class="vote-button" data-option-id="{{ option.id }}">{{ option.text }}: <span id="votes-{{ option.id }}">{{ option.votes }}</span></button>
+                    </div>
+                {% endfor %}
+                <button class="delete-button" data-poll-id="{{ poll.id }}">Delete Poll</button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        const socket = io();
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const createPollForm = document.getElementById('createPollForm');
+            createPollForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const formData = new FormData(createPollForm);
+                fetch('/create_poll', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.poll) {
+                        const pollsDiv = document.getElementById('polls');
+                        const pollDiv = document.createElement('div');
+                        pollDiv.classList.add('poll');
+                        pollDiv.id = `poll-${data.poll.id}`;
+                        pollDiv.innerHTML = `<h2>${data.poll.question}</h2>`;
+                        data.poll.options.forEach(option => {
+                            pollDiv.innerHTML += `<div><button class="vote-button" data-option-id="${option.id}">${option.text}: <span id="votes-${option.id}">${option.votes}</span></button></div>`;
+                        });
+                        pollDiv.innerHTML += `<button class="delete-button" data-poll-id="${data.poll.id}">Delete Poll</button>`;
+                        pollsDiv.appendChild(pollDiv);
+
+                        // Add event listeners to the new elements
+                        addVoteListeners();
+                        addDeleteListeners();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while creating the poll.');
+                });
+            });
+
+            addVoteListeners();
+            addDeleteListeners();
+        });
+
+        function addOption() {
+            const optionsDiv = document.getElementById('options');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'options';
+            input.placeholder = `Option ${optionsDiv.children.length + 1}`;
+            optionsDiv.appendChild(input);
+        }
+
+        function vote(optionId) {
+            socket.emit('vote', { option_id: optionId });
+        }
+
+        function deletePoll(pollId) {
+            fetch(`/delete_poll/${pollId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.message === 'Poll deleted successfully!') {
+                    document.getElementById(`poll-${pollId}`).remove();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the poll.');
+            });
+        }
+
+        function addVoteListeners() {
+            const voteButtons = document.querySelectorAll('.vote-button');
+            voteButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const optionId = event.target.getAttribute('data-option-id');
+                    vote(optionId);
+                });
+            });
+        }
+
+        function addDeleteListeners() {
+            const deleteButtons = document.querySelectorAll('.delete-button');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const pollId = event.target.getAttribute('data-poll-id');
+                    deletePoll(pollId);
+                });
+            });
+        }
+
+        socket.on('update_poll', data => {
+            const poll = document.getElementById(`poll-${data.poll_id}`);
+            data.options.forEach(option => {
+                document.getElementById(`votes-${option.id}`).innerText = option.votes;
+            });
+        });
+    </script>
+</body>
+</html>
